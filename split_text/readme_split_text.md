@@ -47,3 +47,10 @@ def main():
 
 字典：包含两个field，“text”为原文本，“index”为原文本经过分词后得到的index，每个字符的index为0或1。若为1，该字符位于词尾，0则为非词尾。例子：'text': '蟒蛇把猎物囫囵吞下，', 对应的分词结果为'蟒蛇|把|猎物|囫囵|吞|下|，|' 对应的'index': array([0., 1., 1., 0., 1., 0., 1., 0., 1., 1.])}
 
+## 主要函数
+
+`to_sentences(paragraph, mode, language)`: 对给定文本进行按标点切分
+
+`str2dict(text, language)`: 将文本string进行切词，返回一个字典
+
+`split(file_path, language)`: 面向用户的函数，主要用来调用to_sentences
