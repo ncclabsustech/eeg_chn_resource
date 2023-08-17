@@ -1,17 +1,10 @@
 import re
 import jieba
 import numpy as np
-import argparse
 
-"""递归调用，检查句子长度，超过某长度按逗号分"""
-
-newline = "<sep>"
-
-
-# todo: overload,测试英文
 
 def to_sentences(paragraph, mode, language):
-    """由段落切分成句子
+    """对文本进行切分
     @:param paragraph: str文本
     @:param mode:按什么切分，三种："quotation_mark"、"full_stop"、"comma"
             "quotation_mark"表示按引号切分，"full_stop"表示按句末符号（句号、问号、叹号等）切分、"comma"表示按逗号切分
@@ -25,7 +18,8 @@ def to_sentences(paragraph, mode, language):
         if mode == "quotation_mark":
             sentences = re.split(r"(“|”)", paragraph)
         elif mode == "full_stop":
-            sentences = re.split(r"(？|。|！|\…\…|：)", paragraph)
+            # sentences = re.split(r"(？<！\w)(？|。|！|\…\…|：)(？！\w)", paragraph)
+            sentences = re.split(r"(？<=[？。！\…\…：])+", paragraph)
         elif mode == "comma":
             sentences = re.split(r"(，)", paragraph)
         else:
@@ -35,7 +29,7 @@ def to_sentences(paragraph, mode, language):
         if mode == "quotation_mark":
             sentences = re.split(r"(\"|\")", paragraph)
         elif mode == "full_stop":
-            sentences = re.split(r"(\?|\.|\!|\…|:)", paragraph)
+            sentences = re.split(r"(?<=[\?\.\!\…:])+", paragraph)
         elif mode == "comma":
             sentences = re.split(r"(,)", paragraph)
         else:
@@ -61,6 +55,7 @@ def to_sentences(paragraph, mode, language):
             if sentences[j + 1][0] == '”':
                 sentences[j] = sentences[j] + "”"
                 sentences[j + 1] = ""
+            # print(sentences[j])
 
     else:
         for j in range(len(sentences) - 1):
@@ -83,6 +78,7 @@ def to_sentences(paragraph, mode, language):
             sentences[i] = to_sentences(sentences[i], mode="full_stop", language=language)
 
     if mode == "full_stop":
+
         for i in range(len(sentences)):
 
             # if len(sentences[i]) > 10 and ("，" in sentences[i] or "," in sentences[i]):
@@ -95,6 +91,7 @@ def to_sentences(paragraph, mode, language):
 
 def str2dict(text, language):
     """
+    将文本string进行切词，返回一个字典
     :param text: str
     :return: dict，包含两个field：text--原文本，index--原文本经过分词后得到的index，其中1表示词尾，0为非词尾
     例子：'text': '蟒蛇把猎物囫囵吞下，', 对应的分词结果为'蟒蛇|把|猎物|囫囵|吞|下|，|' 对应的'index': array([0., 1., 1., 0., 1., 0., 1., 0., 1., 1.])}
@@ -121,14 +118,15 @@ def str2dict(text, language):
 
 def split(file_path, language):
     """
+    +
+
     :param file_path: 文件路径
     :param language: 文件对应的语言,"Chinese" or "English"
     :return: list，每个元素是分词后的dict
 
-    用来调用to_sentences的
-
     """
     if language == "Chinese" or "English":
+        count = 0
 
         with open(file_path, 'r', encoding='utf-8') as file:
             text = file.read()
@@ -138,20 +136,7 @@ def split(file_path, language):
         raise Exception("invalid language")
 
 def main():
-    # parser = argparse.ArgumentParser()
-    #
-    # # 添加命令行选项
-    # parser.add_argument("-f", "--file", help="指定文件路径")
-    # parser.add_argument("-l", "--language", help="指定文本语言")
-    #
-    # # 解析命令行参数
-    # args = parser.parse_args()
-    #
-    # # 获取选项的值
-    # file_path = args.file
-    # language = args.language
-
-    filename = "xiaowangzi_zhoukexi_main_text.txt"
+    filename = "test.txt"
 
     result = split(filename, language="Chinese")
 
