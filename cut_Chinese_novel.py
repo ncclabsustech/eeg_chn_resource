@@ -81,6 +81,9 @@ def cut_paragraph(paragraph):
     # 去除掉字符串中的\n
     sentences = [delete_specific_element(i, '\n') for i in sentences]
 
+    # 去掉字符串中的空格
+    sentences = [delete_specific_element(i, ' ') for i in sentences]
+
     # 将双引号不在同一个字符串的重新拼回来
     results = []
     isOneSentence = False
@@ -146,6 +149,7 @@ def arrange_sentences_within_30_words(sentences):
     for i in range(1, len(sentences)):
         length_wiithout_punctuation_last, _ = calculate_length_without_punctuation_and_indexes(results[-1])
         length_wiithout_punctuation_new, _ = calculate_length_without_punctuation_and_indexes(sentences[i])
+
 
         if sentences[i] in ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31', '32', '33', '34', '35', '36', '37', '38', '39', '40']:
             results.append(sentences[i])
@@ -244,8 +248,10 @@ def split_preface_main_content(sentences, divide_nums):
 
     #     return breakpoints
 
+
     if '1' in sentences:
         first_chapter_index = sentences.index('1')
+
     else:
         first_chapter_index = len(sentences)
 
@@ -261,6 +267,9 @@ def split_preface_main_content(sentences, divide_nums):
 
 
     cut_chapter = divide_nums
+    for i in range(len(divide_nums)):
+        if cut_chapter[i] + 1 > max_chapter:
+            cut_chapter.pop(i)
     cut_indexes_last = [main_content.index(str(round(i+1))) for i in cut_chapter]
     cut_indexes_last.append(len(main_content)+1)
 
@@ -348,16 +357,18 @@ if __name__ == '__main__':
     with open(args.Chinese_novel_path, encoding='utf-8') as file:
         text = file.read()
         result = cut_paragraph(text)
-        result = cut_sentences(result)
 
+        result = cut_sentences(result)
+        #print(result)
         result = split_chapter_title(result)
+        #print(result)
 
         result = arrange_sentences_within_30_words(result)
 
 
         #print(result)
         result = split_row(result)
-
+        #print(result)
         preface, main_content_parts = split_preface_main_content(result, args.divide_nums)
 
 
